@@ -3,6 +3,7 @@ import React from 'react'
 import TabMain from './src/navigation/tab'
 import { NavigationContainer } from '@react-navigation/native';
 import { SafeAreaListener, SafeAreaProvider, SafeAreaView } from 'react-native-safe-area-context';
+import UserProvider from './src/context/UserContext';
 
 
 const App = () => {
@@ -10,7 +11,9 @@ const App = () => {
     <NavigationContainer>
       <SafeAreaProvider>
         <SafeAreaView style={{ flex: 1 }} edges={['top']}>
-        <TabMain />
+          <UserProvider>
+            <TabMain />
+          </UserProvider>
         </SafeAreaView>
       </SafeAreaProvider>
     </NavigationContainer>

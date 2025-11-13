@@ -1,12 +1,17 @@
 import { View, Text, TouchableOpacity } from 'react-native'
-import React from 'react'
+import React, { useContext } from 'react'
 import { TextInput } from 'react-native-paper';
+import { AuthContextType, userContext } from '../../context/UserContext';
+import { useNavigation } from '@react-navigation/native';
 
 
-const ConfirmCodeScreen = ({ params }: any) => {
-  // const { email } = params;
+const ConfirmCodeScreen = ({ route }: any) => {
+
+  const { email } = route.params;
+  const { login } = useContext(userContext) as AuthContextType
 
 
+  const navigation = useNavigation<any>();
   //burası konfirmation code ekranı olacak. Kullanıcıdan email ile gönderilen onay kodunu girmesi istenecek. Toplamda yan yana" 6 adet TextInput olacak. otomatik olarak bir sonraki inputa geçecek şekilde olacak. Altta bir buton olacak. Butona basıldığında kod doğrulanacak.
 
   return <>
@@ -37,7 +42,8 @@ const ConfirmCodeScreen = ({ params }: any) => {
           width: '100%',
         }}
         onPress={() => {
-          // Validate code
+          login(email);
+          navigation.navigate('HistoryStack');
         }}
       >
         <Text style={{ color: '#fff', fontSize: 16 }}>Submit</Text>
