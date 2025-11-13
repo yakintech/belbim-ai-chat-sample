@@ -1,5 +1,6 @@
 
-import { createContext, useState } from "react";
+import { createContext, useEffect, useEffectEvent, useState } from "react";
+import storageHelper from "../utils/storageHelper";
 
 //Context içerisinde olacak user özellikleri:
 interface User {
@@ -36,12 +37,35 @@ const UserProvider = ({ children }: { children: React.ReactNode }) => {
         });
         setIsLoginedIn(true);
         setLoading(false);
+
+        storageHelper.setItem("user", JSON.stringify({
+            id: "1",
+            email: email
+        }));
+        
     }
 
     const logout = () => {
         setUser(null);
         setIsLoginedIn(false);
+        storageHelper.removeItem("user");
     }
+
+
+    useEffect(() => {
+  
+        storageHelper.getItem("user")
+            .then((storedUser) => {
+                if (storedUser) {
+                    let decodeUser = JSON.parse(storedUser);
+                    setUser(decodeUser);
+                    setIsLoginedIn(true);
+                }
+            })
+
+    }, [])
+    
+
 
     return <userContext.Provider value={{ user, login, logout, isLoginedIn, loading }}>
         {children}
