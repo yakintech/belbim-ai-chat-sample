@@ -4,6 +4,7 @@ import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import ChatStack from '../stack/ChatStack';
 import HistoryStack from '../stack/HistoryStack';
 import ProfileStack from '../stack/ProfileStack';
+import Icon from '@react-native-vector-icons/evil-icons';
 
 const Tab = createBottomTabNavigator();
 
@@ -11,7 +12,29 @@ const Tab = createBottomTabNavigator();
 
 const TabMain = () => {
     return <>
-        <Tab.Navigator screenOptions={{ headerShown: false }}>
+        <Tab.Navigator 
+        screenOptions={
+            ({route}) => ({
+                tabBarIcon: ({focused, color, size}) => {
+                    let iconName = '';
+
+                    if(route.name === 'HistoryStack') {
+                        iconName = 'clock';
+                    } else if(route.name === 'ChatStack') {
+                        iconName = 'comment';
+                    } else if(route.name === 'ProfileStack') {
+                        iconName = 'user';
+                    }
+
+                    return <Icon name={iconName} size={35} color={color} />
+                },
+                tabBarActiveTintColor: '#007AFF',
+                tabBarInactiveTintColor: 'gray',
+                headerShown: false,
+            })
+        }
+        
+        >
             <Tab.Screen name="HistoryStack" component={HistoryStack} />
             <Tab.Screen name="ChatStack" component={ChatStack} />
             <Tab.Screen name="ProfileStack" component={ProfileStack} />

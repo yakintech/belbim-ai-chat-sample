@@ -1,11 +1,26 @@
 import {
   View, Text, StyleSheet, TextInput, TouchableOpacity,
-  KeyboardAvoidingView, Platform
+  KeyboardAvoidingView, Platform, FlatList, ActivityIndicator
 
 } from 'react-native'
-import React from 'react'
+import React, { useState } from 'react'
+import axiosInstance from '../../api/axiosInstance'
+import dayjs from 'dayjs';
+
+
+
+interface Message {
+  id: string;
+  text: string;
+  sender: 'user' | 'ai';
+  date: Date;
+}
 
 const NewChatScreen = () => {
+
+  const [message, setmessage] = useState("")
+  const [messages, setmessages] = useState<Message[]>([])
+  const [loading, setloading] = useState(true);
 
   //FlatList - chat list
   //Input - new chat
@@ -14,6 +29,48 @@ const NewChatScreen = () => {
   //1. FlatList: Kullanıcının önceki mesajlaşmalarını gösterir.
   //2. Input: Kullanıcının yeni mesaj yazabileceği bir metin girişi alanı.
   //3. Button: Kullanıcının yazdığı mesajı gönderebileceği bir buton.
+
+
+  const sendChatMessage = () => {
+
+    let messageToSend = message.trim();
+
+    if (messageToSend.length === 0) {
+      return; // Boş mesaj gönderilmesini engelle
+    }
+
+    let userMessage: Message = {
+      id: Date.now().toString(),
+      text: messageToSend,
+      sender: 'user',
+      date: new Date(),
+    };
+
+    setmessages(prevMessages => [...prevMessages, userMessage]);
+    setmessage("");
+
+    axiosInstance.post("/generate-text", {
+      prompt: messageToSend,
+    }).then(response => {
+
+      // Gelen cevabı messages array'ine ekle
+
+      const newMessage: Message = {
+        id: Date.now().toString(),
+        text: response.data.generatedText,
+        sender: 'ai',
+        date: new Date(),
+      };
+      setmessages(prevMessages => [...prevMessages, newMessage]);
+      setloading(false);
+
+
+    }).catch(error => {
+      console.error("Error sending message:", error);
+      setloading(false);
+    });
+
+  }
   return <>
     <KeyboardAvoidingView
       behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
@@ -23,16 +80,46 @@ const NewChatScreen = () => {
     >
       <View style={styles.container}>
         <View style={styles.flatList}>
-          {/* FlatList component to show previous chats */}
+
+          <FlatList
+           style={{ padding: 10 }}
+            data={messages}
+            keyExtractor={(item) => item.id}
+            renderItem={({ item }) => (
+              <View style={{
+                alignSelf: item.sender === 'user' ? 'flex-end' : 'flex-start',
+                backgroundColor: item.sender === 'user' ? '#DCF8C6' : '#E2E2E2',
+                borderRadius: 10,
+                padding: 10,
+                marginVertical: 5,
+                maxWidth: '80%',
+              }}>
+                <Text>{item.text}</Text>
+                <Text style={{ fontSize: 10, color: 'gray', alignSelf: 'flex-end', marginTop: 5 }}>
+                  {dayjs(item.date).format('HH:mm')}
+                </Text>
+              </View>
+            )}
+          />
+
+
         </View>
         <View style={styles.inputContainer}>
 
           <TextInput
             style={styles.input}
             placeholder="Type your message..."
+            value={message}
+            onChangeText={setmessage}
           />
+          {/* {
+            loading && <ActivityIndicator size="small" color="#007bff" style={{ marginLeft: 10 }} />
+          } */}
 
-          <TouchableOpacity style={styles.button}>
+          <TouchableOpacity
+            style={styles.button}
+            onPress={sendChatMessage}
+          >
             <Text style={styles.buttonText}>Send</Text>
           </TouchableOpacity>
 
