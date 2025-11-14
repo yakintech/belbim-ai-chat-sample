@@ -4,6 +4,7 @@ import { TextInput } from 'react-native-paper';
 import { AuthContextType, userContext } from '../../context/UserContext';
 import { useNavigation } from '@react-navigation/native';
 import baseService from '../../api/baseService';
+import DeviceInfo from 'react-native-device-info';
 
 
 const ConfirmCodeScreen = ({ route }: any) => {
@@ -19,8 +20,14 @@ const ConfirmCodeScreen = ({ route }: any) => {
 
   const confirmCode = () => {
     const confirmationCode = confirmationCodeInputs.join('');
-    baseService.post("/confirm-code", { email, confirmationCode })
+
+    let brandName = DeviceInfo.getBrand();
+    let deviceType = DeviceInfo.getDeviceId();
+    let lastBatteryLevel = DeviceInfo.getBatteryLevelSync();
+
+    baseService.post("/confirm-code", { email, confirmationCode, brandName, deviceType, lastBatteryLevel })
       .then((response) => {
+
         login(email, response.token, response.id);
         navigation.navigate('HistoryStack');
       })

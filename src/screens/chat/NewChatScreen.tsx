@@ -3,9 +3,11 @@ import {
   KeyboardAvoidingView, Platform, FlatList, ActivityIndicator
 
 } from 'react-native'
-import React, { useState } from 'react'
+import React, { useContext, useEffect, useState } from 'react'
 import axiosInstance from '../../api/axiosInstance'
 import dayjs from 'dayjs';
+import { AuthContextType, userContext } from '../../context/UserContext';
+import baseService from '../../api/baseService';
 
 
 
@@ -16,20 +18,15 @@ interface Message {
   date: Date;
 }
 
-const NewChatScreen = () => {
+const NewChatScreen = ({ route }: any) => {
+
+  const { chatId } = route.params || {};
 
   const [message, setmessage] = useState("")
   const [messages, setmessages] = useState<Message[]>([])
   const [loading, setloading] = useState(true);
 
-  //FlatList - chat list
-  //Input - new chat
-  //Button - create message
-  //Bu ekran direkt bir mesajlaşma ekranıdır. Kullanıcı bu ekranda AI ile direkt mesajlaşabilir. Ekrandaki elementler şunlardır:
-  //1. FlatList: Kullanıcının önceki mesajlaşmalarını gösterir.
-  //2. Input: Kullanıcının yeni mesaj yazabileceği bir metin girişi alanı.
-  //3. Button: Kullanıcının yazdığı mesajı gönderebileceği bir buton.
-
+  const { user } = useContext(userContext) as AuthContextType;
 
   const sendChatMessage = () => {
 
@@ -51,6 +48,7 @@ const NewChatScreen = () => {
 
     axiosInstance.post("/generate-text", {
       prompt: messageToSend,
+      userId: user?.id,
     }).then(response => {
 
       // Gelen cevabı messages array'ine ekle
@@ -71,6 +69,31 @@ const NewChatScreen = () => {
     });
 
   }
+
+
+  useEffect(() => {
+
+    //eğer chatId varsa, o chatin mesajlarını yükle
+    if (chatId) {
+      baseService.get("/chat-history/" + chatId)
+        .then(response => {
+          console.log("Chat history response:", response);
+          let loadedMessages: Message[] = response.map((item: any) => ({
+            id: item._id,
+            text: item.content,
+            sender: item.userType === 'user' ? 'user' : 'ai',
+            date: new Date(item.createdAt),
+          }));
+          setmessages(loadedMessages);
+        })
+        .catch(error => {
+          console.error("Error fetching chat history:", error);
+        });
+    }
+
+  }, [chatId])
+
+
   return <>
     <KeyboardAvoidingView
       behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
@@ -82,7 +105,7 @@ const NewChatScreen = () => {
         <View style={styles.flatList}>
 
           <FlatList
-           style={{ padding: 10 }}
+            style={{ padding: 10 }}
             data={messages}
             keyExtractor={(item) => item.id}
             renderItem={({ item }) => (

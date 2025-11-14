@@ -1,14 +1,54 @@
-import { View, Text, TouchableOpacity, Image } from 'react-native'
+import { View, Text, TouchableOpacity, Image, Alert } from 'react-native'
 import React, { useContext, useEffect, useState } from 'react'
 import { AuthContextType, userContext } from '../../context/UserContext';
 import { launchImageLibrary } from 'react-native-image-picker';
 import ImageCropPicker from 'react-native-image-crop-picker';
+import { TextInput } from 'react-native-paper';
+import baseService from '../../api/baseService';
+
 
 const ProfileMainScreen = () => {
 
   const { logout, user } = useContext(userContext) as AuthContextType;
+  const [name, setname] = useState("")
+  const [surname, setsurname] = useState("")
   const [profileImage, setProfileImage] = useState<string | null>(null);
 
+
+  useEffect(() => {
+
+    baseService.get('/user/profile/' + user?.id)
+      .then(response => {
+        const userDetails = response;
+        console.log('User Details: ', userDetails);
+        setname(userDetails.name);
+        setsurname(userDetails.surname);
+      })
+      .catch(error => {
+        console.log('Error fetching user details: ', error);
+      });
+
+  }, [])
+
+
+
+  const updateProfile = () => {
+
+    
+    const updatedData = {
+      name,
+      surname,
+      profileImage,
+    };
+
+    baseService.put('/user/profile/' + user?.id, updatedData)
+      .then(response => {
+        Alert.alert('Success', 'Profile updated successfully');
+      })
+      .catch(error => {
+        console.log('Error updating profile: ', error);
+      });
+  }
 
   const handleImagePick = () => {
     ImageCropPicker.openPicker({
@@ -24,10 +64,10 @@ const ProfileMainScreen = () => {
   return (
     // Profile Page
     <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
-     
+
 
       {/* //profile image, email(readonly),name, surname, logout button */}
-      <TouchableOpacity 
+      <TouchableOpacity
         onPress={async () => {
           const result = await launchImageLibrary({
             mediaType: 'mixed',
@@ -40,24 +80,49 @@ const ProfileMainScreen = () => {
           }
         }}
       >
-      <Image
-        source={{ uri: profileImage || 'https://www.gravatar.com/avatar/00000000000000000000000000000000?d=mp&f=y' }}
-        style={{ width: 100, height: 100, borderRadius: 50, marginBottom: 20 }}
-        
-      />
-      </TouchableOpacity>
-     
-{/* 
-      <TouchableOpacity onPress={handleImagePick}>
         <Image
           source={{ uri: profileImage || 'https://www.gravatar.com/avatar/00000000000000000000000000000000?d=mp&f=y' }}
           style={{ width: 100, height: 100, borderRadius: 50, marginBottom: 20 }}
-        />
-      </TouchableOpacity> */}
 
-      <Text style={{ fontSize: 18, marginBottom: 10 }}>Email: {user?.email}</Text>
-      <Text style={{ fontSize: 18, marginBottom: 10 }}>Name: </Text>
-      <Text style={{ fontSize: 18, marginBottom: 20 }}>Surname: </Text>
+        />
+      </TouchableOpacity>
+
+      <View style={{ width: '80%', marginBottom: 10 }}>
+        <TextInput
+          label="Email"
+          value={user?.email || ''}
+          mode="outlined"
+          style={{ marginBottom: 10 }}
+          editable={false}
+        />
+        <TextInput
+          label="Name"
+          value={name}
+          onChangeText={text => setname(text)}
+          mode="outlined"
+          style={{ marginBottom: 10 }}
+        />
+        <TextInput
+          label="Surname"
+          value={surname}
+          mode="outlined"
+          style={{ marginBottom: 10 }}
+          onChangeText={text => setsurname(text)}
+        />
+      </View>
+
+      <TouchableOpacity
+        style={{
+          backgroundColor: '#007aff',
+          paddingVertical: 10,
+          paddingHorizontal: 20,
+          borderRadius: 5,
+          marginBottom: 20,
+        }}
+        onPress={updateProfile}
+      >
+        <Text style={{ color: '#fff', fontSize: 19 }}>Update</Text>
+      </TouchableOpacity>
 
       <TouchableOpacity
         style={{
@@ -70,7 +135,7 @@ const ProfileMainScreen = () => {
           logout();
         }}
       >
-        <Text style={{ color: '#fff', fontSize: 16 }}>Logout</Text>
+        <Text style={{ color: '#fff', fontSize: 19 }}>Logout</Text>
       </TouchableOpacity>
 
 

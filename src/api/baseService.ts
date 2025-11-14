@@ -11,6 +11,10 @@ const baseService = {
     post: async (endpoint: string, data = {}) => {
         const response = await axiosInstance.post(endpoint, data);
         return response.data;
+    },
+    put: async (endpoint: string, data = {}) => {
+        const response = await axiosInstance.put(endpoint, data);
+        return response.data;
     }
 }
 

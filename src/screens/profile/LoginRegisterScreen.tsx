@@ -1,8 +1,9 @@
-import { View, Text, Touchable, TouchableOpacity } from 'react-native'
+import { View, Text, Touchable, TouchableOpacity, Image } from 'react-native'
 import React, { useState } from 'react'
 import { TextInput } from 'react-native-paper';
 import { useNavigation } from '@react-navigation/native';
 import baseService from '../../api/baseService';
+
 
 const LoginRegisterScreen = () => {
 
@@ -26,6 +27,19 @@ const LoginRegisterScreen = () => {
 
   return <>
     <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center', padding: 20 }}>
+
+
+      {/* LogoArea */}
+      <Image
+        source={require('../../assets/logo.png')}
+        style={{ width: 150, height: 150, marginBottom: 30 }}
+        resizeMode="contain"
+    />
+
+      <Text style={{ fontSize: 24, fontWeight: 'bold', marginBottom: 20 }}>Welcome to AI Chat Assistant</Text>
+      <View style={{ width: '100%' }}>
+
+
       <TextInput
         label="Email"
         mode="outlined"
@@ -48,6 +62,7 @@ const LoginRegisterScreen = () => {
           <Text style={{ color: '#fff', fontSize: 16 }}>Submit</Text>
         </TouchableOpacity>
       </View>
+    </View>
     </View>
 
   </>

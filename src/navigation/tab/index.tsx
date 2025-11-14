@@ -5,6 +5,7 @@ import ChatStack from '../stack/ChatStack';
 import HistoryStack from '../stack/HistoryStack';
 import ProfileStack from '../stack/ProfileStack';
 import Icon from '@react-native-vector-icons/evil-icons';
+import ReportStack from '../stack/ReportStack';
 
 const Tab = createBottomTabNavigator();
 
@@ -25,6 +26,9 @@ const TabMain = () => {
                     } else if(route.name === 'ProfileStack') {
                         iconName = 'user';
                     }
+                    else if(route.name === 'ReportStack') {
+                        iconName = 'chart';
+                    }
 
                     return <Icon name={iconName} size={35} color={color} />
                 },
@@ -37,6 +41,7 @@ const TabMain = () => {
         >
             <Tab.Screen name="HistoryStack" component={HistoryStack} />
             <Tab.Screen name="ChatStack" component={ChatStack} />
+            <Tab.Screen name="ReportStack" component={ReportStack} />
             <Tab.Screen name="ProfileStack" component={ProfileStack} />
         </Tab.Navigator>
     </>
