@@ -5,6 +5,7 @@ import { launchImageLibrary } from 'react-native-image-picker';
 import ImageCropPicker from 'react-native-image-crop-picker';
 import { TextInput } from 'react-native-paper';
 import baseService from '../../api/baseService';
+import DatePicker from 'react-native-date-picker'
 
 
 const ProfileMainScreen = () => {
@@ -13,6 +14,8 @@ const ProfileMainScreen = () => {
   const [name, setname] = useState("")
   const [surname, setsurname] = useState("")
   const [profileImage, setProfileImage] = useState<string | null>(null);
+  const [openDatePicker, setOpenDatePicker] = useState(false);
+  const [date, setDate] = useState(new Date())
 
 
   useEffect(() => {
@@ -20,9 +23,10 @@ const ProfileMainScreen = () => {
     baseService.get('/user/profile/' + user?.id)
       .then(response => {
         const userDetails = response;
-        console.log('User Details: ', userDetails);
         setname(userDetails.name);
         setsurname(userDetails.surname);
+        setProfileImage(userDetails.profileImage);
+        setDate(new Date(userDetails.birthDate));
       })
       .catch(error => {
         console.log('Error fetching user details: ', error);
@@ -34,11 +38,12 @@ const ProfileMainScreen = () => {
 
   const updateProfile = () => {
 
-    
+
     const updatedData = {
       name,
       surname,
       profileImage,
+      birthDate: date.toISOString(),
     };
 
     baseService.put('/user/profile/' + user?.id, updatedData)
@@ -109,6 +114,36 @@ const ProfileMainScreen = () => {
           style={{ marginBottom: 10 }}
           onChangeText={text => setsurname(text)}
         />
+
+        <TouchableOpacity
+          style={{
+            // backgroundColor: '#007aff',
+            borderWidth: 1,
+            borderColor: '#007aff',
+            
+            paddingVertical: 10,
+            paddingHorizontal: 20,
+            borderRadius: 5,
+            marginBottom: 20,
+          }}
+          onPress={() => setOpenDatePicker(true)}
+        >
+          <Text style={{ color: 'black', fontSize: 19 }}>Select Date of Birth</Text>
+        </TouchableOpacity>
+        <DatePicker
+          modal
+          open={openDatePicker}
+          date={date}
+          mode="date"
+          onConfirm={(selectedDate) => {
+            setOpenDatePicker(false);
+            setDate(selectedDate);
+          }}
+          onCancel={() => {
+            setOpenDatePicker(false);
+          }}
+        />
+        <Text>Date of Birth: {date.toDateString()}</Text>
       </View>
 
       <TouchableOpacity
