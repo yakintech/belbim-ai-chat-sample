@@ -2,16 +2,26 @@ import { View, Text, Touchable, TouchableOpacity } from 'react-native'
 import React, { useState } from 'react'
 import { TextInput } from 'react-native-paper';
 import { useNavigation } from '@react-navigation/native';
+import baseService from '../../api/baseService';
 
 const LoginRegisterScreen = () => {
 
-   const [email, setEmail] = useState('');
-    
-    const navigation = useNavigation<any>();
+  const [email, setEmail] = useState('');
 
-    const goToConfirmCodeScreen = () => {
+  const navigation = useNavigation<any>();
+
+  const goToConfirmCodeScreen = () => {
+
+    baseService.post("/login-register", { email })
+      .then((response) => {
         navigation.navigate('ConfirmCodeScreen', { email });
-    }
+      })
+      .catch((error) => {
+        console.error("Error during /login-register:", error);
+      });
+
+
+  }
 
 
   return <>
@@ -39,7 +49,7 @@ const LoginRegisterScreen = () => {
         </TouchableOpacity>
       </View>
     </View>
-  
+
   </>
 }
 

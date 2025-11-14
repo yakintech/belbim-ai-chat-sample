@@ -1,6 +1,7 @@
 
 import { createContext, useEffect, useEffectEvent, useState } from "react";
 import storageHelper from "../utils/storageHelper";
+import baseService from "../api/baseService";
 
 //Context içerisinde olacak user özellikleri:
 interface User {
@@ -11,7 +12,7 @@ interface User {
 //Buradaki AuthContextType globalde erişeceğim özellikler ve metotları tanımlar
 interface AuthContextType {
     user: User | null;
-    login: (email: string) => Promise<void>;
+    login: (email: string, token: string, id: string) => Promise<void>;
     logout: () => void;
     isLoginedIn: boolean;
     loading: boolean;
@@ -29,42 +30,48 @@ const UserProvider = ({ children }: { children: React.ReactNode }) => {
     const [isLoginedIn, setIsLoginedIn] = useState<boolean>(false);
 
 
-    const login = async (email: string) => {
+    const login = async (email: string, token: string, id: string) => {
 
         setUser({
-            id: "1",
+            id: id,
             email: email
         });
         setIsLoginedIn(true);
         setLoading(false);
 
         storageHelper.setItem("user", JSON.stringify({
-            id: "1",
+            id: id,
             email: email
         }));
-        
+
+        storageHelper.setItem("token", token);
+
     }
 
     const logout = () => {
         setUser(null);
         setIsLoginedIn(false);
         storageHelper.removeItem("user");
+        storageHelper.removeItem("token");
     }
 
 
     useEffect(() => {
-  
-        storageHelper.getItem("user")
-            .then((storedUser) => {
-                if (storedUser) {
-                    let decodeUser = JSON.parse(storedUser);
-                    setUser(decodeUser);
-                    setIsLoginedIn(true);
-                }
+        baseService.post("/check-auth")
+            .then((response) => {
+                setUser({
+                    id: response.id,
+                    email: response.email
+                });
+                setIsLoginedIn(true);
+                setLoading(false);
             })
-
+            .catch((error) => {
+                console.error("Error during /check-auth:", error);
+                setLoading(false);
+            });
     }, [])
-    
+
 
 
     return <userContext.Provider value={{ user, login, logout, isLoginedIn, loading }}>
