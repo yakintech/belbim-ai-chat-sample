@@ -1,0 +1,16 @@
+{
+    "common": {
+        "en": "İngilizce",
+        "tr": "Türkçe"
+    },
+    "tab": {
+        "chat": "Sohbet",
+        "report": "Rapor",
+        "profile": "Profil",
+        "history": "Geçmiş"
+    },
+    "profile": {
+        "logout": "Çıkış Yap",
+        "change_language": "Türkçeye Geç"
+    }
+}

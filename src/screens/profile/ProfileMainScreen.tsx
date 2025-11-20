@@ -7,6 +7,10 @@ import { TextInput } from 'react-native-paper';
 import baseService from '../../api/baseService';
 import DatePicker from 'react-native-date-picker'
 import { check, PERMISSIONS, RESULTS, openSettings } from "react-native-permissions"
+import { useTranslation } from 'react-i18next';
+import i18n from '../../translation/i18n';
+import { Switch } from 'react-native-paper';
+
 
 
 const ProfileMainScreen = () => {
@@ -18,6 +22,7 @@ const ProfileMainScreen = () => {
   const [openDatePicker, setOpenDatePicker] = useState(false);
   const [date, setDate] = useState(new Date())
 
+   const { t } = useTranslation();
 
   const galleryPermission = Platform.OS === 'ios' ? PERMISSIONS.IOS.PHOTO_LIBRARY : PERMISSIONS.ANDROID.READ_EXTERNAL_STORAGE;
 
@@ -65,6 +70,10 @@ const ProfileMainScreen = () => {
 
   }, [])
 
+
+  const changeLanguage = (lang: string) => {
+    i18n.changeLanguage(lang);
+  }
 
 
   const updateProfile = () => {
@@ -204,7 +213,19 @@ const ProfileMainScreen = () => {
         <Text style={{ color: '#fff', fontSize: 19 }}>Logout</Text>
       </TouchableOpacity>
 
-
+      <View style={{ flexDirection: 'row', alignItems: 'center', marginTop: 20 }}>
+        {
+          <Text style={{ fontSize: 16, marginRight: 10 }}>
+            {i18n.language === 'tr' ? 'Türkçe' : 'English'}
+          </Text>
+        }
+        <Switch
+          value={i18n.language === 'tr'}
+          onValueChange={(value) => {
+            changeLanguage(value ? 'tr' : 'en');
+          }}
+        />
+      </View>
 
     </View>
   )

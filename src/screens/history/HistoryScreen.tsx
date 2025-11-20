@@ -5,7 +5,7 @@ import { AuthContextType, userContext } from '../../context/UserContext'
 import dayjs from 'dayjs';
 import { useNavigation } from '@react-navigation/native';
 import { Button } from 'react-native-paper';
-import Share from 'react-native-share';
+import Share, { ShareOptions } from 'react-native-share';
 import Icon from '@react-native-vector-icons/evil-icons';
 
 
@@ -72,7 +72,7 @@ const HistoryScreen = () => {
               style={{ position: 'absolute', right: 20, top: 25 }}
               onPress={() => {
 
-                let shareOptions = {
+                let shareOptions : ShareOptions = {
                   title: 'Share Chat',
                   message: `Check out this chat: ${item.lastMessage}`,
                   url: 'aichatassistant://chat/' + item.chatId

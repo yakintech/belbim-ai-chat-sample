@@ -1,0 +1,16 @@
+{
+    "tab": {
+        "chat": "Chat",
+        "report": "Report",
+        "profile": "Profile",
+        "history": "History"
+    },
+    "profile": {
+        "logout": "Logout",
+        "change_language": "Change Language to Turkish"
+    },
+    "common": {
+        "en": "English",
+        "tr": "Türkçe"
+    }
+}
