@@ -1,4 +1,4 @@
-import { View, Text, TouchableOpacity, Image, Alert } from 'react-native'
+import { View, Text, TouchableOpacity, Image, Alert, Platform } from 'react-native'
 import React, { useContext, useEffect, useState } from 'react'
 import { AuthContextType, userContext } from '../../context/UserContext';
 import { launchImageLibrary } from 'react-native-image-picker';
@@ -6,6 +6,7 @@ import ImageCropPicker from 'react-native-image-crop-picker';
 import { TextInput } from 'react-native-paper';
 import baseService from '../../api/baseService';
 import DatePicker from 'react-native-date-picker'
+import { check, PERMISSIONS, RESULTS, openSettings } from "react-native-permissions"
 
 
 const ProfileMainScreen = () => {
@@ -16,6 +17,36 @@ const ProfileMainScreen = () => {
   const [profileImage, setProfileImage] = useState<string | null>(null);
   const [openDatePicker, setOpenDatePicker] = useState(false);
   const [date, setDate] = useState(new Date())
+
+
+  const galleryPermission = Platform.OS === 'ios' ? PERMISSIONS.IOS.PHOTO_LIBRARY : PERMISSIONS.ANDROID.READ_EXTERNAL_STORAGE;
+
+
+  useEffect(() => {
+
+    checkGalleryPermission();
+  }, [])
+  
+
+  const checkGalleryPermission = async () => {
+
+    const result = await check(galleryPermission);
+
+    if(result == RESULTS.DENIED){
+      // Alert.alert("Permission Denied", "Please allow gallery access from settings.",
+      // [
+      //   {
+      //     text: "Cancel",
+      //     style: "cancel"
+      //   },
+      //   {
+      //     text: "Open Settings",
+      //     onPress: () => openSettings()
+      //   }
+      // ]
+      // );
+    }
+  }
 
 
   useEffect(() => {
@@ -120,7 +151,7 @@ const ProfileMainScreen = () => {
             // backgroundColor: '#007aff',
             borderWidth: 1,
             borderColor: '#007aff',
-            
+
             paddingVertical: 10,
             paddingHorizontal: 20,
             borderRadius: 5,
