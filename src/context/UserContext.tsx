@@ -2,6 +2,7 @@
 import { createContext, useEffect, useEffectEvent, useState } from "react";
 import storageHelper from "../utils/storageHelper";
 import baseService from "../api/baseService";
+import secureStorageHelper from "../utils/secureStorageHelper";
 
 //Context içerisinde olacak user özellikleri:
 interface User {
@@ -44,7 +45,7 @@ const UserProvider = ({ children }: { children: React.ReactNode }) => {
             email: email
         }));
 
-        storageHelper.setItem("token", token);
+        secureStorageHelper.setItem("token", token);
 
     }
 
@@ -52,7 +53,7 @@ const UserProvider = ({ children }: { children: React.ReactNode }) => {
         setUser(null);
         setIsLoginedIn(false);
         storageHelper.removeItem("user");
-        storageHelper.removeItem("token");
+        secureStorageHelper.removeItem("token");
     }
 
 

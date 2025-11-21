@@ -4,6 +4,8 @@ import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import HistoryScreen from '../../screens/history/HistoryScreen';
 import { AuthContextType, userContext } from '../../context/UserContext';
 import PublicScreen from '../../screens/public';
+import HistoryScreenSwr from '../../screens/history/HistoryScreenSwr';
+import HistoryScreenReactQuery from '../../screens/history/HistoryScreenReactQuery';
 
 const Stack = createNativeStackNavigator();
 

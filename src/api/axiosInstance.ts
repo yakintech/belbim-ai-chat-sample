@@ -1,14 +1,15 @@
 import axios from "axios";
 import storageHelper from "../utils/storageHelper";
+import secureStorageHelper from "../utils/secureStorageHelper";
 
 const axiosInstance = axios.create({
-    // baseURL: "https://lionfish-app-vvj8m.ondigitalocean.app",
+    //baseURL: "https://lionfish-app-vvj8m.ondigitalocean.app",
     baseURL: "http://localhost:3000",
 })
 
 
 axiosInstance.interceptors.request.use(async (config: any) => {
-    const token = await storageHelper.getItem("token");
+    const token = await secureStorageHelper.getItem("token");
     if (token) {
         config.headers = {
             ...config.headers,

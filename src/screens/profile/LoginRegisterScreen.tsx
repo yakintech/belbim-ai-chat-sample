@@ -7,7 +7,7 @@ import baseService from '../../api/baseService';
 
 const LoginRegisterScreen = () => {
 
-  const [email, setEmail] = useState('');
+  const [email, setEmail] = useState('cagatay@mail.com');
 
   const navigation = useNavigation<any>();
 

@@ -1,13 +1,12 @@
 import { View, FlatList, Text, RefreshControl, Touchable, TouchableOpacity, Linking } from 'react-native'
 import React, { useContext, useEffect, useState } from 'react'
-import baseService from '../../api/baseService'
 import { AuthContextType, userContext } from '../../context/UserContext'
 import dayjs from 'dayjs';
 import { useNavigation } from '@react-navigation/native';
-import { Button } from 'react-native-paper';
 import Share, { ShareOptions } from 'react-native-share';
 import Icon from '@react-native-vector-icons/evil-icons';
-import LottieView from "lottie-react-native";
+import useSWR from 'swr';
+import baseService from '../../api/baseService';
 
 
 
@@ -17,46 +16,31 @@ interface ChatHistory {
   updatedAt: string;
 }
 
-const HistoryScreen = () => {
+const HistoryScreenSwr = () => {
 
-  const [chatHistories, setChatHistories] = useState<ChatHistory[]>([])
+
   const [refreshing, setRefreshing] = useState(false);
-
-  const { user } = useContext(userContext) as AuthContextType
-
   const navigation = useNavigation<any>();
+  const { user } = useContext(userContext) as AuthContextType
+  
 
   const onRefresh = () => {
     setRefreshing(true);
-    loadChatHistories();
+    mutate()
+    .then(() => {
+      setRefreshing(false);
+    })
+    .catch(() => {
+      setRefreshing(false);
+    });
   }
 
-  const loadChatHistories = () => {
-    baseService.get('/chat-histories/' + user?.id)
-      .then(response => {
-        setChatHistories(response);
-      })
-      .catch(error => {
-        console.log('Error fetching chat histories: ', error);
-      });
-    setRefreshing(false);
-  }
 
-  useEffect(() => {
-    loadChatHistories();
-  }, [])
+  const fetcher = (url: string) => baseService.get(url);
 
-  if (chatHistories.length === 0) {
-    return <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
-      <LottieView
-        source={require('../../assets/airobot.json')}
-        autoPlay
-        loop
-        style={{ width: 200, height: 200 }}
-      />
-      <Text style={{ fontSize: 18, color: '#666', marginTop: 20 }}>No chat history available.</Text>
-    </View>
-  }
+  //state management, error handling built-in, loading states, revalidation, caching
+  const { data: chatHistories, error, mutate, isLoading } = useSWR<ChatHistory[]>('/chat-histories/' + user?.id, fetcher)
+
 
 
   return <>
@@ -87,7 +71,7 @@ const HistoryScreen = () => {
               style={{ position: 'absolute', right: 20, top: 25 }}
               onPress={() => {
 
-                let shareOptions: ShareOptions = {
+                let shareOptions : ShareOptions = {
                   title: 'Share Chat',
                   message: `Check out this chat: ${item.lastMessage}`,
                   url: 'aichatassistant://chat/' + item.chatId
@@ -98,42 +82,15 @@ const HistoryScreen = () => {
             >
               <Icon name="share-apple" size={30} color="#007AFF" />
             </TouchableOpacity>
-
-            {/* <Button
-              mode="contained"
-              onPress={() => {
-                Share.open({
-                  title: 'Share Chat',
-                  message: `Check out this chat: ${item.lastMessage}`,
-                });
-              }}
-            >
-              <Icon name="share-apple" size={30} color="#007AFF" />
-            </TouchableOpacity>
-
-            {/* <Button
-              mode="contained"
-              onPress={() => {
-                Share.open({
-                  title: 'Share Chat',
-                  message: `Check out this chat: ${item.lastMessage}`,
-                });
-              }}
-            >
-              Share
-            </Button> */}
           </>
         )}
         refreshControl={
           <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
         }
       />
-
-
     </View>
-
 
   </>
 }
 
-export default HistoryScreen
+export default HistoryScreenSwr
